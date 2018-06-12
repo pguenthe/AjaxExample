@@ -1,0 +1,59 @@
+﻿@{
+    ViewBag.Title = "Product List";
+}
+<input id="bob" list="prodlist" class="form-control"
+       oninput="search()" >
+
+<datalist id="prodlist">
+</datalist>
+
+<table class="table table-striped" id="products">
+    <!-- this is the inner HTML for #customers -->
+</table>
+
+<script type="text/javascript"
+        src="~/Scripts/jquery-1.10.2.min.js"></script>
+<script>
+    function search() {
+        $.ajax(
+            {
+                type: 'POST',
+                url: '/Home/GetProductsByName',
+                data: '{pname: "' + document.getElementById("bob").value
+                + '"}',
+                contentType: 'application/json; charset-utf-8',
+                dataType: 'json',
+                success:
+                function (response) {
+                    var tableHTML = "<tr><th>Prod ID</th>"
+                        + "<th>Product Name</th>"
+                        + "<th>Price</th>"
+                        + "<th>Qty in Stock</th></tr>";
+                    var prodList = "";
+
+                    for (var i = 0; i < response.length; i++) {
+                        var Product = response[i];
+                        var tr = "<tr><td>" + Product.ProductID + "</td>"
+                            + "<td>" + Product.ProductName + "</td>"
+                            + "<td>$" + Product.UnitPrice.toFixed(2) + "</td>"
+                            + "<td>" + Product.UnitsInStock + "</td>"
+                            + "</tr>";
+                        tableHTML += tr;
+                        prodList += '<option value="' + Product.ProductName + '" />';
+                    }
+                    document.getElementById("products")
+                        .innerHTML = tableHTML;
+                    document.getElementById("prodlist")
+                        .innerHTML = prodList;
+                },
+                failure: function (response) {
+                    alert("Failure" + response.responseText);
+                },
+                error: function (response) {
+                    alert("Error" + response.responseText);
+                }
+            }
+
+        );
+    }
+</script>

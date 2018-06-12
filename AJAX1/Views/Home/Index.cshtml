@@ -1,0 +1,55 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+
+City:
+<input type="text" id="city" class="form-control" 
+       oninput="search()"/>
+<!-- input type="button" id="search" value="Search by City"
+        class="btn btn-default" onclick="search()" /-->
+
+<table class="table table-striped" id="customers">
+    <!-- this is the inner HTML for #customers -->
+</table>
+
+<script type="text/javascript" 
+        src="~/Scripts/jquery-1.10.2.min.js"></script>
+<script>
+    function search() {
+        $.ajax(
+            {
+                type: 'POST',
+                url: '/Home/GetCustomersByCity',
+                data: '{city: "' + document.getElementById("city").value
+                + '"}',
+                contentType: 'application/json; charset-utf-8',
+                dataType: 'json',
+                success:
+                function (response) {
+                    var tableHTML = "<tr><th>Cust ID</th>"
+                        + "<th>Company Name</th>"
+                        + "<th>Contact Name</th>"
+                        + "<th>City</th></tr>";
+                        for (var i = 0; i < response.length; i++) {
+                            var Customer = response[i];
+                            var tr = "<tr><td>" + Customer.CustomerID + "</td>"
+                                + "<td>" + Customer.CompanyName + "</td>" 
+                                + "<td>" + Customer.ContactName + "</td>"
+                                + "<td>" + Customer.City + "</td>"
+                                + "</tr>";
+                            tableHTML += tr;
+                        }
+                        document.getElementById("customers")
+                            .innerHTML = tableHTML;
+                    },
+                failure: function (response) {
+                    alert("Failure" + response.responseText);
+                },
+                error: function (response) {
+                    alert("Error" + response.responseText);
+                }
+            }
+
+        );
+    }
+</script>
